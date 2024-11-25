@@ -37,36 +37,38 @@ map(c("hi", "hello", "yoohoo"), ~print(.x))
 map(c("hi", "hello", "yoohoo"), print)
 ```
 
-How is this different from a non-functional? Let's say you wanted to simulate rolling die with different number of sides. You could use a for loop to iterate over each number of sides:
+How is this different from a non-functional? Let's say you wanted to simulate rolling a standard die (d6), a d10, and a magic 8 ball 10 times. You could use a for loop to do this:
 ```{r}
-d6_roll <- numeric(10)
-d10_roll <- numeric(10)
-magic8ball_roll <- numeric(10)
-for (i in 1:10) {
-  d6_roll[i] <- sample(1:6, 1, replace = TRUE)
-  d10_roll[i] <- sample(1:10, 1, replace = TRUE)
-  magic8ball_roll[i] <- sample(1:20, 1, replace = TRUE)
+die <- c(d6 = 6, d10 = 10, magic8ball = 20)
+
+roll_results <- list()
+
+for (i in 1:length(die)) {
+  roll_results[[i]] <- sample(1:die[i], 10, replace = TRUE)
 }
-d6_roll
-d10_roll
-magic8ball_roll
+
+names(roll_results) <- names(die)
+
+roll_results
 ```
 
 Or you could define a function to roll a die given some number of sides and then use map to run that function 10 times:
 ```{r}
-roll <- function(sides) sample(1:sides, 1, replace = TRUE)
+die <- c(d6 = 6, d10 = 10, magic8ball = 20)
 
-d6_roll <- map_dbl(1:10, ~roll(sides = 6))
-d10_roll <- map_dbl(1:10, ~roll(sides = 10))
-magic8ball_roll <- map_dbl(1:10, ~roll(sides = 20))
+roll <- function(sides) sample(1:sides, 10, replace = TRUE)
 
-d6_roll
-d10_roll
-magic8ball_roll
+roll_results <- map(die, roll)
+
+roll_results
 ```
-What is nice about the second approach is that it is more modular and easier to read. You can see that we are rolling a die with 6 sides, 10 sides, and 20 sides, and we are doing it 10 times. ALso, if there happened to be a bug in the roll function, we could fix it in one place and it would be fixed for all the rolls. We also won't have any side effects from the for loop, such as accidentally overwriting a variable.
 
-Note that `map_dbl()` is used here instead of `map()` because we know that the output of roll is a number (known as a double) and we want to simplify the output to a vector rather than a list (as would be returned by map). You can also use `map_chr()` if you know the output will be a character vector, `map_lgl()` if you know the output will be a logical vector, etc.
+Some benefits of this approach are: 
+1. It is easier to read and understand. You define a function whose name tells you what it is doing (`roll()`) and then apply that function to your list of die.
+2.  If there happened to be a bug in the `roll()` function, we could fix it in one place and it would be fixed for all the rolls. 
+3.  You can easily modify the function by adding additional arguments, such as the number of times to roll the die.
+4.  We won't have any side effects from the for loop, such as accidentally overwriting a variable.
+5.  The output preserves the names of the input vector, so we easily know which die each set of rolls corresponds to without having to assign names to the output (which can be risky in other contexts).
 
 If you don't like the tidyverse, you can also use `sapply()` or `lapply()` to do the same thing:
 ```{r}
