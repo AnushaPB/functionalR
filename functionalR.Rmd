@@ -286,7 +286,7 @@ After reviewing your results, you want to exclude any points that are in the oce
 # Write your code here
 ```
 
-# A word of caution
+## A word of caution
 
 We have mentioned how one of the benefits of functional programming is that you can avoid side effects; side effects are effects that you don't intend to happen when you run your code. For example, if you have a for loop that changes a variable you didn't mean too, that is a side effect. Using a functional approach can help you avoid side effects by explicitly defining the input and output of your functions. 
 
